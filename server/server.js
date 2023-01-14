@@ -17,6 +17,7 @@ const { MongoClient } = require("mongodb");
 const databaseName = "task";
 
 
+
 //this part connects to mongodb
 MongoClient.connect(password, 
   { useNewUrlParser: true }, 
@@ -36,15 +37,13 @@ MongoClient.connect(password,
   //     res.json(result);
   //   })
   // })
-  
+
   app.get("/api", (req, res) => {
     dbo.collection("task").aggregate([{ $project: {detail : 1, priority: 1}}]).toArray(function(err, result) {
       if (err) throw err;
       res.json(result);
     })
-
   })
-
 
   })
 
@@ -74,14 +73,17 @@ MongoClient.connect(password,
   }
   var dbo = db.db(databaseName)
   console.log("Connection established - All Well");
+  
   app.get('/ins/:detailHere', (req,res) => {
     var myobj = { detail: req.params.detailHere, priority: '0'};
+    
     dbo.collection("task").insertOne(myobj, function(err, res) {
       if (err) throw err;
       console.log("1 document inserted");
     })
     res.redirect('/api');
   })
+
   })
 
 MongoClient.connect(password, 
