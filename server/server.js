@@ -1,6 +1,3 @@
-
-
-
 var myPassword = require('./password');
 
 //run it with npm run dev, this way it updates with browser refresh
@@ -15,6 +12,9 @@ app.use(cors())
 const { MongoClient } = require("mongodb");
 // const uri=process.env.URI;
 const databaseName = "task";
+
+
+
 
 
 
@@ -39,14 +39,14 @@ MongoClient.connect(password,
   // })
 
   app.get("/api", (req, res) => {
-    dbo.collection("task").aggregate([{ $project: {detail : 1, priority: 1}}]).toArray(function(err, result) {
+    dbo.collection("task").aggregate([{ $project: {detail : 1, sector: 1}}]).toArray(function(err, result) {
       if (err) throw err;
       res.json(result);
     })
   })
 
   })
-
+//takes a string as input
 MongoClient.connect(password, 
   { useNewUrlParser: true }, 
   function(err, db) {
@@ -65,6 +65,7 @@ MongoClient.connect(password,
   })
   })
 
+//takes json string as input
 MongoClient.connect(password, 
   { useNewUrlParser: true }, 
   function(err, db) {
@@ -75,7 +76,14 @@ MongoClient.connect(password,
   console.log("Connection established - All Well");
   
   app.get('/ins/:detailHere', (req,res) => {
-    var myobj = { detail: req.params.detailHere, priority: '0'};
+    console.log(req.params.detailHere)
+    detail = req.params.detailHere
+    jsonString = JSON.parse(detail)
+
+    console.log(typeof(jsonString))
+    console.log(jsonString.detail)    
+    
+    var myobj = { detail: jsonString.detail, sector: jsonString.sector};
     
     dbo.collection("task").insertOne(myobj, function(err, res) {
       if (err) throw err;
@@ -83,9 +91,9 @@ MongoClient.connect(password,
     })
     res.redirect('/api');
   })
-
   })
 
+//this returns an array
 MongoClient.connect(password, 
   { useNewUrlParser: true }, 
   function(err, db) {
@@ -94,19 +102,16 @@ MongoClient.connect(password,
   }
   var dbo = db.db(databaseName)
   console.log("Connection established - All Well");
-  app.get('/ins1/:detailHere', (req,res) => {
-    var myobj = { detail: req.params.detailHere, priority: '1'};
-    dbo.collection("task").insertOne(myobj, function(err, res) {
+
+  app.get('/sector/:detailHere', (req,res) => {
+    const sector = req.params.detailHere
+    dbo.collection("task").find({sector: sector}).toArray(function(err, result) {
       if (err) throw err;
-      console.log("1 document inserted");
+      res.json(result);
     })
-    res.redirect('/api');
   })
 
 })
-
-
-
 
 // //makes sure server is listening on port 5000
 // app.listen(process.env.PORT || 5000, () => { console.log("Server started on port 5000")})
